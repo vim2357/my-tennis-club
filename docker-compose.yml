@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: my_tennis_app
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_DB_HOST=db
+      - DJANGO_DB_PORT=5432
+      - DJANGO_DB_NAME=mytennisdb
+      - DJANGO_DB_USER=mytennisuser
+      - DJANGO_DB_PASSWORD=mytennispassword
+    depends_on:
+      - db
+    networks:
+      - tennis_network
+
+  db:
+    image: postgres:13
+    container_name: postgres_mytennisdb
+    environment:
+      - POSTGRES_DB=mytennisdb
+      - POSTGRES_USER=mytennisuser
+      - POSTGRES_PASSWORD=mytennispassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - tennis_network
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  tennis_network:
+    driver: bridge
